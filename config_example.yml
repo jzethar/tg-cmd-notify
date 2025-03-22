@@ -1,0 +1,4 @@
+chat_id: CHAT_ID
+tg_bot_token: TG_BOT_TOKEN
+instance: YOUR_INSTANCE
+thread_id: THREAD_ID
