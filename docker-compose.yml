@@ -1,0 +1,33 @@
+version: "3.7"
+
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 5m
+      max-file: "2"
+
+services:
+  tgnotify:
+    init: true
+    container_name: tgnotify
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: no
+    environment:
+      - GOMAXPROCS=1
+    deploy:
+      resources:
+        limits:
+          memory: 0.1G
+          cpus: "1"
+    <<: *logging
+    networks:
+      - tgnotify_net
+    volumes:
+      - ./config.yml:/home/tgnotify/config.yml
+    command: ["ping", "google.com"]
+
+networks:
+  tgnotify_net: {}
