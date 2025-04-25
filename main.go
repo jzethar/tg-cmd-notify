@@ -87,11 +87,11 @@ func main() {
 		cmdArgs []string
 		cmdProg string
 	)
-	notifyConfig := os.Getenv("NOTIFY_CONFIG")
-	if len(notifyConfig) == 0 {
-		log.Fatal().Msg("No config provided in NOTIFY_CONFIG")
+	notifyConfigPath := os.Getenv("NOTIFY_CONFIG")
+	if len(notifyConfigPath) == 0 {
+		notifyConfigPath = "/home/tgnotify/config.yml"
 	}
-	config := newConfig(notifyConfig)
+	config := newConfig(notifyConfigPath)
 	bot := newBot(config)
 
 	switch len(os.Args) {
