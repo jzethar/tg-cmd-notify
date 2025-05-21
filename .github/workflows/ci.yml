@@ -1,7 +1,10 @@
 name: Lint and build
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # This event will only trigger a workflow run if the workflow file exists on the default branch.
+  push:
+    branches: 
+      - github-ci
   release:
     types:
       - created  # Trigger on new GitHub release (for Docker build)
