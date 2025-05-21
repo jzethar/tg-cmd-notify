@@ -79,6 +79,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            dist/myapp-*
+            dist/tg-cmd-notify-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
