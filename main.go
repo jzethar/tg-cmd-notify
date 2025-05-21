@@ -32,7 +32,9 @@ func newConfig(configFilePath string) *Config {
 	if file, err = os.Open(configFilePath); err != nil {
 		log.Fatal().Msg("can't open file")
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close() // it should be checked in future
+	}()
 
 	if data, err = io.ReadAll(file); err != nil {
 		log.Fatal().Msg("can't read file")
