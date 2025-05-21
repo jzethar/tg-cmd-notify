@@ -2,8 +2,6 @@ name: Lint and build
 
 on:
   workflow_dispatch:
-  push:
-  pull_request:
   release:
     types:
       - created  # Trigger on new GitHub release (for Docker build)
@@ -40,6 +38,9 @@ jobs:
     name: Build and Publish Go Binary
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write  # Required to create a release and upload assets
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,22 +48,34 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.24
+          go-version: '1.24'  # or your preferred version
 
-      - name: Download Go Modules
-        run: go mod download
+      - name: Set env variables
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
-      - name: Tidy Go Modules
-        run: go mod tidy
+      - name: Build binaries for multiple OS/ARCH
+        run: |
+          mkdir -p dist
+          GOOS=linux GOARCH=amd64   go build -o dist/tg-cmd-notify-linux-amd64
+          GOOS=windows GOARCH=amd64 go build -o dist/tg-cmd-notify-windows-amd64.exe
+          GOOS=darwin GOARCH=amd64  go build -o dist/tg-cmd-notify-darwin-amd64
+          GOOS=darwin GOARCH=arm64  go build -o dist/tg-cmd-notify-darwin-arm64
 
-      - name: Build Go Binary
-        run: go build -o tg-cmd-notify .
-
-      - name: Create Release Asset
-        id: create_release_asset
-        uses: actions/upload-release-asset@v3
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: tg-cmd-notify
-          asset_name: tg-cmd-notify-linux-amd64
-          asset_content_type: application/octet-stream
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binaries to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/myapp-*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
