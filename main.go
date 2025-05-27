@@ -118,6 +118,7 @@ func main() {
 	}()
 	cmd := exec.CommandContext(ctx, cmdProg, cmdArgs...)
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	if err = cmd.Run(); err != nil {
 		log.Info().Msgf("could not run command: %v", err)
